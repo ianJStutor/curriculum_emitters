@@ -51,4 +51,35 @@
 ### 02 - Adding a click listener
 
 1. Click events are fired with a mouse press and release or with a tap. A click event will define the new emitter source location
-2. 
+2. In <code>particle.js</code>, increase the speed range:
+    ```js
+    const minSpeed = 2;
+    const maxSpeed = 5;
+    ```
+    Depending on screen size, this should produce a more continuous flow of particles
+3. In the "setup" section, add a new function:
+    ```js
+    export function setEmitter({ x, y }) {
+        emitter.x = x;
+        emitter.y = y;
+    }
+    ```
+    * The "setup" section should probably be split into "setup" and "getters and setters" (or something like that) for better long-term maintenance. If students can handle the cognitive load, feel free
+    * Point out that this is an exported function, which means another module will handle the click event listening
+4. In <code>index.js</code>, add <code>setEmitter</code> to the imports:
+    ```js
+    import { update, draw, setEmitter } from "./particles.js";
+    ```
+5. Add to the <code>init</code> function:
+    ```js
+    //init
+    function init() {
+        canvas.addEventListener("click", setEmitter);
+        update(canvas);
+        requestAnimationFrame(loop);
+    }
+    ```
+    * Note that there isn't a <code>removeEventListener()</code> call, which means this <code>init</code> function must only be called once. For this project, that's okay, but for future, larger projects, there might need to be a one-time-only setup as well as reset functionality so that duplicate event listeners aren't stacked on top of one another
+    * The click event object has <code>x</code> and <code>y</code> properties that can be sent directly to the <code>setEmitter</code> function. Note that this only works with a full-screen canvas; other properties, like <code>offsetX</code> and <code>offsetY</code> might be needed for canvases that aren't full-screen
+    * Touches will trigger a click event, but note that many mobile devices might interpret touch events as an interaction with the device rather than an interaction with the web site. Often, <code>e.preventDefault()</code> works to prevent this, as does the CSS property <code>touch-events: none;</code>. But use these with caution as they might affect usability and load-time efficiency. If the latter is important, consider adding the <code>{ passive: true }</code> option as the third argument to <code>addEventListener</code>
+6. Running the code at this time allows for a click to change the position of the source, the emitter. Particles emit from the location of the most recent click event (or the default canvas center)

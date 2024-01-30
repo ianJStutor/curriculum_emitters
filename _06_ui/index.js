@@ -1,6 +1,6 @@
 //dependencies
 import { fullscreenCanvas } from "./fullscreenCanvas.js";
-import { update, draw } from "./particles.js";
+import { update, draw, setEmitter } from "./particles.js";
 
 //environment
 const canvas = document.querySelector("canvas");
@@ -20,6 +20,7 @@ function loop(t) {
 
 //init
 function init() {
+    canvas.addEventListener("click", setEmitter);
     update(canvas);
     requestAnimationFrame(loop);
 }

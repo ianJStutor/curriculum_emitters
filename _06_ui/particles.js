@@ -35,7 +35,7 @@ function getParticle({ width, height }) {
     };
 }
 
-function setEmitter({ x, y }) {
+export function setEmitter({ x, y }) {
     emitter.x = x;
     emitter.y = y;
 }
