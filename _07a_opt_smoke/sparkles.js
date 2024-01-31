@@ -7,8 +7,11 @@ const minRadius = 2;
 const maxRadius = 5;
 const minSpeed = 2;
 const maxSpeed = 5;
-const acceleration = 1;
+const acceleration = 0.98;
 const opacity = 1;
+const minLife = 75;
+const maxLife = 125;
+const color = "white";
 
 //state
 const particles = [];
@@ -31,7 +34,8 @@ function getParticle({ width, height }) {
     const { x, y } = emitter;
     return {
         r: lerp(minRadius, maxRadius, Math.random()),
-        x, y, vx, vy, opacity
+        x, y, vx, vy, opacity, color,
+        life: Math.round(lerp(minLife, maxLife, Math.random()))
     };
 }
 
@@ -48,27 +52,23 @@ export function update(canvas) {
     const { width, height } = canvas;
     for (let i=0; i<particles.length; i++) {
         let p = particles[i];
-        //move and accelerate, change opacity
+        //move and accelerate, change opacity, life
         p.x += p.vx;
         p.y += p.vy;
         p.vx *= acceleration;
         p.vy *= acceleration;
-        p.opacity = Math.min(1, p.opacity * acceleration);
-        //off screen?
-        if (
-            p.x + p.r < 0 ||
-            p.x - p.r > width ||
-            p.y + p.r < 0 ||
-            p.y - p.r > height
-        ) particles[i] = getParticle(canvas);
+        p.opacity *= acceleration;
+        p.life--;
+        //needs respawning?
+        if (p.life <= 0) particles[i] = getParticle(canvas);
     }
 }
 
 export function draw(ctx) {
     ctx.save();
-    for (let { x, y, r, opacity } of particles) {
+    for (let { x, y, r, opacity, color } of particles) {
         ctx.globalAlpha = opacity;
-        ctx.fillStyle = "white";
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI*2);
         ctx.fill();
