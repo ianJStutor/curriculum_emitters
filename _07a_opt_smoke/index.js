@@ -1,6 +1,6 @@
 //dependencies
 import { fullscreenCanvas } from "./fullscreenCanvas.js";
-import { update, draw, setEmitter } from "./sparkles.js";
+import { update, draw, setEmitter } from "./smoke.js";
 
 //environment
 const canvas = document.querySelector("canvas");

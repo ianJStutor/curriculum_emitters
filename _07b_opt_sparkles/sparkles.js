@@ -49,7 +49,6 @@ export function update(canvas) {
     //setup needed?
     if (!particles.length) return setupParticles(canvas);
     //update particles
-    const { width, height } = canvas;
     for (let i=0; i<particles.length; i++) {
         let p = particles[i];
         //move and accelerate, change opacity, life

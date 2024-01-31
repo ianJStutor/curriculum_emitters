@@ -3,11 +3,11 @@ import { lerp, degToRad, polarToCartesian } from "./lib.js";
 
 //settings
 const numParticles = 250;
-const minRadius = 2;
-const maxRadius = 5;
+const minRadius = 5;
+const maxRadius = 25;
 const minSpeed = 2;
 const maxSpeed = 5;
-const acceleration = 0.98;
+const acceleration = 0.95;
 const opacity = 1;
 const minLife = 75;
 const maxLife = 125;
@@ -49,7 +49,6 @@ export function update(canvas) {
     //setup needed?
     if (!particles.length) return setupParticles(canvas);
     //update particles
-    const { width, height } = canvas;
     for (let i=0; i<particles.length; i++) {
         let p = particles[i];
         //move and accelerate, change opacity, life

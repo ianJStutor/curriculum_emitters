@@ -1,4 +1,4 @@
-# Emitters 06: UI
+# Emitters 06: Life source
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -107,7 +107,8 @@
     ```
     * <code>color</code> has been added to each particle
     * Point out that <code>Math.round</code> is used to keep <code>life</code> an integer
-4. In the <code>update</code> function, there are changes in the <code>for</code> loop:
+4. In the <code>update</code> function, the width and height destructuring from the <code>canvas</code> has been removed since those values are never used
+5. Also, there are changes in the <code>for</code> loop:
     ```js
     for (let i=0; i<particles.length; i++) {
         let p = particles[i];
@@ -125,7 +126,7 @@
     * <code>opacity</code> has been simplified. Since <code>acceleration</code> is less than one, <code>opacity</code> will get smaller, so there's no need to make sure it doesn't go above <code>1</code>
     * All the out-of-bounds detection has been removed
     * <code>life</code> decreases each animation frame. When its value falls to zero (or below, somehow...using such precautions, however implausible, is a good idea based on many past mistakes) then the particle is respawned
-5. In the <code>draw</code> function, the <code>for...of</code> loop has changed slightly:
+6. In the <code>draw</code> function, the <code>for...of</code> loop has changed slightly:
     ```js
     for (let { x, y, r, opacity, color } of particles) {
         ctx.globalAlpha = opacity;
@@ -136,4 +137,4 @@
     }
     ```
     Point out that the <code>color</code> property is destructured and then applied to the context's <code>fillStyle</code>. Hardcoded values should be in settings only
-6. Running the code at this time produces a burst of particles from wherever the emitter is. The particles slow down and fade out as they radiate from the emitter source point. Respawn is based on time--specifically animation frames--rather than position on or off the canvas
+7. Running the code at this time produces a burst of particles from wherever the emitter is. The particles slow down and fade out as they radiate from the emitter source point. Respawn is based on time--specifically animation frames--rather than position on or off the canvas
