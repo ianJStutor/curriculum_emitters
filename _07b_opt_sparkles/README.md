@@ -1,4 +1,4 @@
-# Emitters 06: UI
+# Emitters 07 (option B): Sparkles
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -8,78 +8,77 @@
 * <code>index.js</code> - JavaScript module for setting up an app
 * <code>fullscreenCanvas.js</code> - JavaScript module for managing a full-screen canvas that self adjusts with browser window resizing
 * <code>lib.js</code> - helper functions in one library
-* <code>particles.js</code> - particle module
+* <code>sparkles.js</code> - particle module
 
 ## Lesson notes
 
-### 01 - Define the source
-
-1. The previous step defined the middle of the canvas as the source of all particles. Some rewriting is needed to be able to move that source anywhere
-2. In <code>particles.js</code>, add <code>emitter</code> to the "state" section:
+### 01 - Put a ring on it
+1. Rename <code>particle.js</code> to <code>sparkles.js</code>
+2. In <code>index.js</code>, update the import source as <code>sparkles.js</code>
+3. In <code>sparkles.js</code>, note the following settings:
     ```js
-    const emitter = { x: undefined, y: undefined };
+    //settings
+    const numParticles = 250;
+    const minRadius = 1;
+    const maxRadius = 3;
+    const minSpeed = 2;
+    const maxSpeed = 5;
+    const acceleration = 0.98;
+    const minLife = 75;
+    const maxLife = 125;
+    const innerColor = "gold";
+    const outerColor = "white";
     ```
-3. The <code>setupParticles</code> function has some additions:
-    ```js
-    //setup
-    function setupParticles(canvas) {
-        const { width, height } = canvas;
-        emitter.x = width/2;
-        emitter.y = height/2;
-        for (let i=0; i<numParticles; i++) {
-            particles[i] = getParticle(canvas);
-        }
-    }
-    ```
-    The emitter position is defined with the particle setup. By default, the emitter is in the center of the canvas, but it can move (we'll get to it)
-4. The <code>getParticle</code> function has changed:
+    * The <code>opacity</code> setting has been removed because opacity doesn't change during this animation
+    * There's an <code>innerColor</code> and an <code>outerColor</code>
+4. There are changes to the <code>getParticle</code> function:
     ```js
     function getParticle({ width, height }) {
         const angle = lerp(0, degToRad(360), Math.random());
         const speed = lerp(minSpeed, maxSpeed, Math.random());
         const { x: vx, y: vy } = polarToCartesian({ a: angle, v: speed });
         const { x, y } = emitter;
+        const r = lerp(minRadius, maxRadius, Math.random());
         return {
-            r: lerp(minRadius, maxRadius, Math.random()),
-            x, y, vx, vy, opacity
+            stroke: r/2,
+            r, x, y, vx, vy, innerColor, outerColor,
+            life: Math.round(lerp(minLife, maxLife, Math.random()))
         };
     }
     ```
-    By looking up the emitter position instead of assuming it's the center of the canvas, the emitter position can move and all future particles will spawn there
-5. Running the code at this time produces no obvious difference from the previous step. Next, it's time to change the emitter position
-
-### 02 - Adding a click listener
-
-1. Click events are fired with a mouse press and release or with a tap. A click event will define the new emitter source location
-2. In <code>particle.js</code>, increase the speed range:
+    * The <code>opacity</code> property has been removed because opacity doesn't change in this animation
+    * The <code>r</code> variable is abstracted from the return object because it's used twice, including for the new <code>stroke</code> property
+5. In the <code>update</code> function, delete the following line:
     ```js
-    const minSpeed = 2;
-    const maxSpeed = 5;
+    p.opacity *= acceleration;
     ```
-    Depending on screen size, this should produce a more continuous flow of particles
-3. In the "setup" section, add a new function:
+    There will be no fading in or out for sparkles
+6. The <code>draw</code> function has changed:
     ```js
-    export function setEmitter({ x, y }) {
-        emitter.x = x;
-        emitter.y = y;
+    export function draw(ctx) {
+        ctx.save();
+        for (let { x, y, r, stroke, innerColor, outerColor } of particles) {
+            ctx.fillStyle = innerColor;
+            ctx.strokeStyle = outerColor;
+            ctx.lineWidth = stroke;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI*2);
+            ctx.fill();
+            ctx.stroke();
+        }
+        ctx.restore();
     }
     ```
-    * The "setup" section should probably be split into "setup" and "getters and setters" (or something like that) for better long-term maintenance. If students can handle the cognitive load, feel free
-    * Point out that this is an exported function, which means another module will handle the click event listening
-4. In <code>index.js</code>, add <code>setEmitter</code> to the imports:
-    ```js
-    import { update, draw, setEmitter } from "./particles.js";
-    ```
-5. Add to the <code>init</code> function:
-    ```js
-    //init
-    function init() {
-        canvas.addEventListener("click", setEmitter);
-        update(canvas);
-        requestAnimationFrame(loop);
-    }
-    ```
-    * Note that there isn't a <code>removeEventListener()</code> call, which means this <code>init</code> function must only be called once. For this project, that's okay, but for future, larger projects, there might need to be a one-time-only setup as well as reset functionality so that duplicate event listeners aren't stacked on top of one another
-    * The click event object has <code>x</code> and <code>y</code> properties that can be sent directly to the <code>setEmitter</code> function. Note that this only works with a full-screen canvas; other properties, like <code>offsetX</code> and <code>offsetY</code> might be needed for canvases that aren't full-screen
-    * Touches will trigger a click event, but note that many mobile devices might interpret touch events as an interaction with the device rather than an interaction with the web site. Often, <code>e.preventDefault()</code> works to prevent this, as does the CSS property <code>touch-events: none;</code>. But use these with caution as they might affect usability and load-time efficiency. If the latter is important, consider adding the <code>{ passive: true }</code> option as the third argument to <code>addEventListener</code>
-6. Running the code at this time allows for a click to change the position of the source, the emitter. Particles emit from the location of the most recent click event (or the default canvas center)
+    * The <code>opacity</code> property has been removed because opacity doesn't change during this animation
+    * The new properties <code>stroke</code>, <code>innerColor</code>, and <code>outerColor</code> are destructured from each particle
+    * The line <code>ctx.globalAlpha = opacity;</code> has been removed because opacity doesn't change during this animation
+    * Each circle now has a stroke, a ring around the circumference
+7. Running the code at this time creates radiating particles, but they don't yet sparkle
+
+### 02 - Like magic
+
+1. ???
+
+### 03 - Follow the leader
+
+1. ???
