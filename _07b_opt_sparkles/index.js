@@ -20,7 +20,11 @@ function loop(t) {
 
 //init
 function init() {
-    canvas.addEventListener("click", setEmitter);
+    canvas.addEventListener("pointermove", setEmitter);
+    canvas.addEventListener("touchmove", e => {
+        const { screenX: x, screenY: y } = e.touches?.[0]; 
+        setEmitter({ x, y });
+    });
     update(canvas);
     requestAnimationFrame(loop);
 }

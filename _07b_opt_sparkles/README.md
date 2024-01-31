@@ -2,6 +2,10 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
+## Warning
+
+This effect produces a sparkling, shimmery particle effect that might be problematic for some people.
+
 ## Files
 
 * <code>index.html</code> - Entry file for every web app
@@ -24,12 +28,13 @@
     const minSpeed = 2;
     const maxSpeed = 5;
     const acceleration = 0.98;
-    const minLife = 75;
-    const maxLife = 125;
+    const minLife = 25;
+    const maxLife = 75;
     const innerColor = "gold";
     const outerColor = "white";
     ```
     * The <code>opacity</code> setting has been removed because opacity doesn't change during this animation
+    * The min and max values for life have been reduced. Particles now exist for fewer animation frames before respawning
     * There's an <code>innerColor</code> and an <code>outerColor</code>
 4. There are changes to the <code>getParticle</code> function:
     ```js
@@ -77,8 +82,44 @@
 
 ### 02 - Like magic
 
-1. ???
+1. In <code>sparkles.js</code>, add another setting:
+    ```js
+    const sparkleChance = 0.6;
+    ```
+    This represents the chance of the particle being drawn. If the particle is drawn in some animation frames and not others then it creates a shimmery effect. Be aware that this might be upsetting for some people
+2. A new line is added to the <code>draw</code> function:
+    ```js
+    export function draw(ctx) {
+        ctx.save();
+        for (let { x, y, r, stroke, innerColor, outerColor } of particles) {
+            if (Math.random() > sparkleChance) continue;
+            ctx.fillStyle = innerColor;
+            ctx.strokeStyle = outerColor;
+            ctx.lineWidth = stroke;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI*2);
+            ctx.fill();
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+    ```
+    If a random value isn't less than <code>sparkeChance</code>, then the loop continues without drawing that particle. This is the source of the sparkle
 
 ### 03 - Follow the leader
 
-1. ???
+1. In <code>index.js</code>, there's a change to the <code>init</code> function:
+    ```js
+    function init() {
+        canvas.addEventListener("pointermove", setEmitter);
+        canvas.addEventListener("touchmove", e => {
+            const { clientX: x, clientY: y } = e.touches?.[0]; 
+            setEmitter({ x, y });
+        });
+        update(canvas);
+        requestAnimationFrame(loop);
+    }
+    ```
+    * The <code>pointermove</code> event listener replaces the <code>click</code> event listener. Now, the sparkles become a mouse trail
+    * The <code>touchmove</code> event listener is a little more complex because an array of touches can be detected and each touch event has <code>clientX</code> and <code>clientY</code> properties instead of <code>x</code> and <code>y</code> properties
+    * Review events, destructuring, and optional chaining, if necessary
