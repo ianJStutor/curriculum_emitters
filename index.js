@@ -1,6 +1,8 @@
 //dependencies
 import { fullscreenCanvas } from "./fullscreenCanvas.js";
-import { update, draw, setEmitter } from "./sparkles.js";
+import { update as particlesUpdate, draw as particlesDraw, setEmitter as particlesSetEmitter } from "./particles.js";
+import { update as smokeUpdate, draw as smokeDraw, setEmitter as smokeSetEmitter } from "./smoke.js";
+import { update as sparklesUpdate, draw as sparklesDraw, setEmitter as sparklesSetEmitter } from "./sparkles.js";
 
 //environment
 const canvas = document.querySelector("canvas");
@@ -20,11 +22,7 @@ function loop(t) {
 
 //init
 function init() {
-    canvas.addEventListener("pointermove", setEmitter);
-    canvas.addEventListener("touchmove", e => {
-        const { screenX: x, screenY: y } = e.touches?.[0]; 
-        setEmitter({ x, y });
-    });
+    canvas.addEventListener("click", setEmitter);
     update(canvas);
     requestAnimationFrame(loop);
 }
