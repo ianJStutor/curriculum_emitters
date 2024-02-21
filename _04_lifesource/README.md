@@ -96,7 +96,7 @@
     ```
     * We're bringing <code>acceleration</code> back, but this time it's less than one (barely). This means that speed and opacity will become a smaller and smaller number each animation frame, but never actually reaching zero
     * In this context, "life" refers to the number of animation frames before the particle needs to respawn, regardless of position
-    * <code>color</color> is now defined in the settings, not in the <code>draw</code> function, which is better engineering
+    * <code>color</code> is now defined in the settings, not in the <code>draw</code> function, which is better engineering
 3. In the <code>getParticle</code> function, add to the returned particle object:
     ```js
     return {
